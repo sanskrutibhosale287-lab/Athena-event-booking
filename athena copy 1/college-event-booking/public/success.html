@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Pass</title>
+    <!-- PDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Barcode & QR Code Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;800&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e9ecef;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        /* Increased width slightly to prevent horizontal text from cramping */
+        .ticket-wrapper {
+            position: relative;
+            display: flex;
+            width: 850px; 
+            height: 300px;
+            background: linear-gradient(135deg, #00d2ff 0%, #7f00ff 100%);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            color: white;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        /* Left side cutout (semi-circle) */
+        .ticket-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -20px;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            background-color: #e9ecef;
+            border-radius: 50%;
+            z-index: 2;
+        }
+
+        /* Main Ticket Section */
+        .ticket-main {
+            flex: 1;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-sizing: border-box;
+            min-width: 0; /* Prevents flex children from blowing out width */
+        }
+
+        .header h1 { 
+            margin: 0; 
+            font-size: 24px; /* Scaled down slightly to fit long titles perfectly */
+            font-weight: 800; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px; 
+            line-height: 1.2;
+            white-space: normal; /* Allows text to wrap to the next line */
+            overflow: visible;   /* Prevents cutting off */
+        }
+        .header h2 { margin: 0; font-size: 16px; font-weight: 300; text-transform: uppercase; letter-spacing: 2px; opacity: 0.9; }
+
+        .name-section { margin-top: 10px; }
+        .name-section .label { margin: 0; font-size: 12px; opacity: 0.8; letter-spacing: 1px; }
+        .name-section .value { margin: 5px 0 0 0; font-size: 32px; font-weight: 700; text-transform: uppercase; }
+        .name-section .code { margin: 5px 0 0 0; font-size: 14px; letter-spacing: 1px; }
+        .name-section .code span { font-weight: 700; }
+
+        .footer {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        
+        /* STRICT BARCODE LOCKING */
+        .barcode-container {
+            background: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            width: 220px; /* Lock the width */
+            flex-shrink: 0;
+        }
+        #barcode {
+            width: 100% !important; /* Force SVG to shrink into the container */
+            height: 40px !important;
+            display: block;
+        }
+
+        /* NEW: Stacked Details Layout */
+        .details-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            text-align: left;
+            white-space: nowrap; 
+        }
+        .details-row {
+            display: flex;
+            gap: 40px;
+        }
+        .detail-box p { margin: 0; font-size: 10px; opacity: 0.8; letter-spacing: 1px; }
+        .detail-box h4 { margin: 2px 0 0 0; font-size: 14px; font-weight: 700; }
+
+        /* Ticket Stub Section (Right side) */
+        .ticket-stub {
+            width: 250px; /* Locked width so it doesn't get squished */
+            flex-shrink: 0;
+            border-left: 2px dashed rgba(255, 255, 255, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .stub-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .qr-container {
+            background: white;
+            padding: 8px;
+            border-radius: 4px;
+            border: 2px solid #1c1c1c; /* QR Border */
+        }
+        
+        .stub-text {
+            width: 100%;
+            text-align: left;
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .stub-text h3 { margin: 0; font-size: 16px; font-weight: 800; line-height: 1.2; }
+        .stub-text p { margin: 0; font-size: 14px; font-weight: 400; opacity: 0.9; }
+        
+        .stub-text .highlight {
+            font-family: monospace;
+            font-size: 14px;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+
+        .download-btn {
+            margin-top: 40px;
+            background: #1c1c1c;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .download-btn:hover { transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+
+    <div id="ticket-wrapper" class="ticket-wrapper">
+        <div class="ticket-main">
+            <div class="header">
+                <h1 id="t-event">TICKET NAME</h1>
+                <h2>ATHENA FEST 2026</h2>
+            </div>
+            
+            <div class="name-section">
+                <p class="label">ATTENDEE NAME</p>
+                <h2 id="t-name" class="value">MR. YOUR NAME</h2>
+                <p class="code">TXN CODE: <span id="t-code1">FR33P1K</span></p>
+            </div>
+
+            <div class="footer">
+                <div class="barcode-container">
+                    <svg id="barcode"></svg>
+                </div>
+                
+                <!-- NEW: Stacked HTML Layout -->
+                <div class="details-wrapper">
+                    <div class="details-row">
+                        <div class="detail-box">
+                            <p>GATE</p>
+                            <h4>MAIN</h4>
+                        </div>
+                        <div class="detail-box">
+                            <p>PASSES</p>
+                            <h4 id="t-passes">1</h4>
+                        </div>
+                    </div>
+                    <div class="detail-box">
+                        <p>DATE & TIME</p>
+                        <h4 id="t-date">08:00 PM</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ticket-stub">
+            <div class="stub-content">
+                <div class="qr-container" id="qrcode"></div>
+                <div class="stub-text">
+                    <h3 id="stub-event">TICKET NAME</h3>
+                    <p id="stub-name">MR. YOUR NAME</p>
+                    <div class="highlight" id="t-code2">FR33P1K</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FIXED BUTTON: Removed onclick, added ID -->
+    <button class="download-btn" id="download-btn">Download E-Ticket</button>
+
+    <script>
+        // 1. Extract URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const eventName = urlParams.get('event') || 'Campus Event';
+        const attendeeName = urlParams.get('name') || 'Guest Attendee';
+        const eventDate = urlParams.get('date') || 'Date TBD';
+        const passes = urlParams.get('passes') || '1';
+        
+        // 2. Fetch the ID and slice from the 5th character (index 4)
+        let paymentId = urlParams.get('paymentId') || 'DEMO123456789';
+        const txnCode = paymentId.substring(4).toUpperCase();
+
+        // 3. Populate the text fields
+        document.getElementById('t-event').innerText = eventName;
+        document.getElementById('stub-event').innerText = eventName;
+        
+        document.getElementById('t-name').innerText = attendeeName;
+        document.getElementById('stub-name').innerText = attendeeName;
+        
+        // Use the newly sliced txnCode
+        document.getElementById('t-code1').innerText = txnCode;
+        document.getElementById('t-code2').innerText = txnCode;
+        
+        document.getElementById('t-date').innerText = eventDate;
+        document.getElementById('t-passes').innerText = passes;
+
+        // 4. Generate the Barcode using the full sliced code
+        JsBarcode("#barcode", txnCode, {
+            format: "CODE128",
+            displayValue: false,
+            lineColor: "#000",
+            margin: 0
+        });
+
+        // 5. Generate the QR Code on the stub
+        new QRCode(document.getElementById("qrcode"), {
+            text: `Valid Pass | ${eventName} | ${attendeeName} | ${paymentId}`,
+            width: 70, /* Scaled down slightly to fit neatly */
+            height: 70,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.L
+        });
+
+        // 6. Rock-solid PDF Download Logic
+        document.getElementById('download-btn').addEventListener('click', function() {
+            // Change button text so the user knows it's working
+            const btn = this;
+            btn.innerText = "Generating PDF...";
+            btn.style.opacity = "0.7";
+
+            const element = document.getElementById('ticket-wrapper');
+            
+            // Simplified, stable PDF options
+            const opt = {
+                margin:       0.3,
+                filename:     'Athena_Fest_Ticket.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
+            };
+            
+            // Generate and save
+            html2pdf().set(opt).from(element).save().then(() => {
+                // Restore button after download
+                btn.innerText = "Download E-Ticket";
+                btn.style.opacity = "1";
+            });
+        });
+    </script>
+</body>
+</html>

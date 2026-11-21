@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Athena Fest 2026 | Events</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --bg: #f8f9fa; 
+            --text-main: #1c1c1c; 
+            --text-muted: #696969; 
+            --accent: #E23744; 
+            --border: #ebebeb;
+            --card-bg: #ffffff;
+        }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            margin: 0; 
+            background-color: var(--bg); 
+            color: var(--text-main); 
+            padding-bottom: 4rem;
+        }
+
+        /* Sleek Top Navigation */
+        .navbar {
+            background: var(--card-bg);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+        }
+        .navbar .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--text-main);
+            text-decoration: none;
+        }
+        .navbar .logo span {
+            color: var(--accent);
+        }
+        .search-bar {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 0.8rem 1.2rem;
+            width: 300px;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 2rem; 
+        }
+
+        /* Category Chips / Taxonomy */
+        .categories {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+            scrollbar-width: none; /* Firefox */
+        }
+        .categories::-webkit-scrollbar { display: none; } /* Chrome */
+        .chip {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 0.6rem 1.2rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .chip:hover, .chip.active {
+            background: var(--text-main);
+            color: white;
+            border-color: var(--text-main);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        /* Grid & Horizontal Scroll Layouts */
+        .events-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, 280px); /* Forces exactly 280px width */
+            gap: 1.5rem; 
+            justify-content: center; /* Centers the grid if there is extra space */
+        }
+
+        /* Card Design - District Style */
+        .event-card { 
+            width: 280px; /* Locks the card width */
+            background: var(--card-bg); 
+            border-radius: 16px; 
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03); 
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border);
+        }
+        .event-card:hover { 
+            transform: translateY(-4px); 
+            box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+        }
+        
+        .card-img {
+            width: 100%;
+            height: 180px;
+            background-color: #e2e2e2;
+            background-size: cover; /* This forces the image to cover the whole box without stretching */
+            background-position: center center; /* This ensures the cropping happens equally from the middle */
+            background-repeat: no-repeat; /* Prevents the image from tiling if it's too small */
+            position: relative;
+            border-radius: 16px 16px 0 0; /* Ensures the top corners match the rounded card */
+        }
+        
+        .date-badge {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            backdrop-filter: blur(4px);
+        }
+
+        .card-content { 
+            padding: 1.2rem; 
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        .card-title { 
+            font-size: 1.1rem; 
+            font-weight: 700; 
+            margin: 0 0 0.5rem 0; 
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .card-venue {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .card-footer {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border);
+            padding-top: 1rem;
+        }
+        .price {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+        .book-label {
+            color: var(--accent);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        footer { 
+            background: var(--card-bg); 
+            border-top: 1px solid var(--border);
+            padding: 3rem 2rem; 
+            margin-top: 4rem; 
+        }
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        /* Local Image References for Homepage Cards */
+        .img-edm { background-image: url('/images/edm.jpg'); }
+        .img-tech-1 { background-image: url('/images/hackathon.jpg'); }
+        .img-tech-2 { background-image: url('/images/cloud.jpg'); }
+        .img-fashion { background-image: url('/images/fashion.jpg'); }
+        .img-dance { background-image: url('/images/dance.jpg'); }
+        .img-comedy { background-image: url('/images/comedy.jpg'); }
+    </style>
+</head>
+<body>
+
+    <!-- Sleek Top Navbar -->
+    <nav class="navbar">
+        <a href="#" class="logo">Athena<span>Fest</span></a>
+        <!-- Changed to an actual input field so the user can type -->
+        <input type="text" id="searchInput" class="search-bar" placeholder="Search for events, workshops, and shows...">
+    </nav>
+
+    <div class="container">
+        
+        <!-- Category Filters -->
+        <div class="categories">
+            <div class="chip active" data-filter="all">All Events</div>
+            <div class="chip" data-filter="music">Music Event</div>
+            <div class="chip" data-filter="tech">Tech & Workshops</div>
+            <div class="chip" data-filter="performance">Performances</div>
+            <div class="chip" data-filter="comedy">Comedy Event</div>
+        </div>
+
+        <h2 class="section-title">Featured events on campus</h2>
+        
+        <div class="events-grid">
+            <!-- Event 1 -->
+            <a href="event.html?event=EDM-Night" class="event-card" data-category="music">
+                <div class="card-img img-edm">
+                    <div class="date-badge">MON, 19 OCT • 8:00 PM</div>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">EDM Concert Night ft. Top DJs</h3>
+                    <div class="card-venue">📍 Main Campus Ground</div>
+                    <div class="card-footer">
+                        <div class="price">₹500</div>
+                        <div class="book-label">Book Now →</div>
+                    </div>
+                </div>
+            </a>
+            
+            <!-- Event 2 -->
+            <a href="event.html?event=Hackathon" class="event-card" data-category="tech">
+                <div class="card-img img-tech-1">
+                    <div class="date-badge">TUE, 20 OCT • 10:00 AM</div>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">Tech Hackathon 24-Hour Challenge</h3>
+                    <div class="card-venue">📍 Computer Science Block</div>
+                    <div class="card-footer">
+                        <div class="price">₹500</div>
+                        <div class="book-label">Book Now →</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Event 3 -->
+            <a href="event.html?event=Cloud-Bootcamp" class="event-card" data-category="tech">
+                <div class="card-img img-tech-2">
+                    <div class="date-badge">WED, 21 OCT • 11:00 AM</div>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">Cloud Architecture Bootcamp (AWS & Docker)</h3>
+                    <div class="card-venue">📍 Seminar Hall 2</div>
+                    <div class="card-footer">
+                        <div class="price">₹500</div>
+                        <div class="book-label">Book Now →</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Event 4 -->
+            <a href="event.html?event=Fashion-Show" class="event-card" data-category="performance">
+                <div class="card-img img-fashion">
+                    <div class="date-badge">THURS, 22 OCT • 6:30 PM</div>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">Campus Couture Fashion Show</h3>
+                    <div class="card-venue">📍 College Auditorium</div>
+                    <div class="card-footer">
+                        <div class="price">₹500</div>
+                        <div class="book-label">Book Now →</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Event 5 -->
+            <a href="event.html?event=Dance-Battle" class="event-card" data-category="performance">
+                <div class="card-img img-dance">
+                    <div class="date-badge">FRI, 23 OCT • 5:00 PM</div>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">Inter-College Dance Battle Championship</h3>
+                    <div class="card-venue">📍 Open Air Theatre</div>
+                    <div class="card-footer">
+                        <div class="price">₹500</div>
+                        <div class="book-label">Book Now →</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Event 6 -->
+            <a href="event.html?event=Comedy-Fiesta" class="event-card" data-category="comedy">
+                <div class="card-img img-comedy">
+                    <div class="date-badge">SAT, 24 OCT • 7:00 PM</div>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">Stand-up Comedy Fiesta</h3>
+                    <div class="card-venue">📍 Student Activity Center</div>
+                    <div class="card-footer">
+                        <div class="price">₹500</div>
+                        <div class="book-label">Book Now →</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <h3 style="color: var(--text-main); margin-top: 0;">Athena Fest 2026</h3>
+            <p>We are a premier institution dedicated to fostering innovation, culture, and technical excellence. Join us in celebrating our annual flagship event.</p>
+            <p style="margin-top: 2rem; font-size: 0.8rem; border-top: 1px solid var(--border); padding-top: 1rem;">
+                © 2026 Athena Fest. All rights reserved.
+            </p>
+        </div>
+    </footer>
+    <script>
+        // FILTER LOGIC ---
+        const chips = document.querySelectorAll('.chip');
+        const cards = document.querySelectorAll('.event-card');
+
+        chips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                chips.forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                
+                // Clear the search bar when a filter is clicked
+                document.getElementById('searchInput').value = '';
+
+                const filter = chip.getAttribute('data-filter');
+                cards.forEach(card => {
+                    const cardCategory = card.getAttribute('data-category');
+                    if (filter === 'all' || cardCategory === filter) {
+                        card.style.display = 'flex';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // --- SEARCH BAR LOGIC ---
+        const searchInput = document.getElementById('searchInput');
+
+        searchInput.addEventListener('keyup', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+
+            // When searching, reset the category chips back to 'All Events' visually
+            chips.forEach(c => c.classList.remove('active'));
+            document.querySelector('[data-filter="all"]').classList.add('active');
+
+            // Loop through all cards and search their titles
+            cards.forEach(card => {
+                // Find the h3 title inside the specific card
+                const title = card.querySelector('.card-title').innerText.toLowerCase();
+                
+                // If the title includes the typed letters, show it. Otherwise, hide it.
+                if (title.includes(searchTerm)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

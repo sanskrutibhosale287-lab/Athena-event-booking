@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Details | Athena Fest 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        :root { 
+            --bg: #f8f9fa; 
+            --text-main: #1c1c1c; 
+            --text-muted: #696969; 
+            --accent: #E23744;
+            --border: #ebebeb;
+            --card-bg: #ffffff;
+        }
+        
+        body { font-family: 'Inter', sans-serif; margin: 0; background-color: var(--bg); color: var(--text-main); }
+        .navbar { background: var(--card-bg); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+        .navbar .logo { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; color: var(--text-main); text-decoration: none; }
+        .navbar .logo span { color: var(--accent); }
+        .back-link { font-size: 0.9rem; color: var(--text-muted); text-decoration: none; font-weight: 500; }
+        .back-link:hover { color: var(--text-main); }
+
+        .event-container { max-width: 1100px; margin: 2rem auto; padding: 0 2rem; display: flex; gap: 3rem; align-items: flex-start; }
+        .event-details { flex: 1; }
+        
+        /* Banner styles based on event type */
+        .hero-banner 
+        { 
+            width: 606px; /* Locks width to exactly 606px */
+            max-width: 100%; /* Ensures it shrinks on mobile screens */
+            height: 350px; /* Locks height to exactly 350px */
+            border-radius: 16px; 
+            margin-bottom: 2rem; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+            background-size: cover; /* Crops image to fit perfectly */
+            background-position: center;
+        }
+        .img-edm { background: linear-gradient(45deg, #1a2a6c, #b21f1f, #fdbb2d); }
+        .img-tech { background: linear-gradient(45deg, #0f2027, #203a43, #2c5364); }
+        .img-fashion { background: linear-gradient(45deg, #ff9a9e, #fecfef); }
+        .img-dance { background: linear-gradient(45deg, #f12711, #f5af19); }
+        .img-comedy { background: linear-gradient(45deg, #8E2DE2, #4A00E0); }
+        .img-default { background: linear-gradient(135deg, #2d3436, #636e72); }
+
+        .event-title { font-size: 2.2rem; font-weight: 800; margin: 0 0 1rem 0; line-height: 1.2; }
+        .event-meta { display: flex; gap: 2rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1.5rem; }
+        .meta-item { display: flex; flex-direction: column; gap: 0.3rem; }
+        .meta-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        .meta-value { font-size: 1rem; font-weight: 600; color: var(--text-main); }
+        
+        .about-section h3 { font-size: 1.3rem; margin-bottom: 1rem; }
+        .about-section p { color: var(--text-muted); line-height: 1.6; font-size: 1rem; }
+
+        .booking-sidebar { width: 380px; background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.08); position: sticky; top: 100px; }
+        .price-header { font-size: 1.8rem; font-weight: 800; margin: 0 0 1.5rem 0; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
+        .price-header span { font-size: 0.9rem; color: var(--text-muted); font-weight: 500; }
+
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label { display: block; margin-bottom: 0.4rem; font-weight: 600; font-size: 0.9rem; }
+        .form-control { width: 100%; padding: 0.8rem 1rem; border: 1px solid #d1d5db; border-radius: 8px; outline: none; box-sizing: border-box; font-family: inherit; font-size: 1rem; transition: border-color 0.2s; background-color: #fff; }
+        .form-control:focus { border-color: var(--accent); }
+        .btn-pay { width: 100%; background: var(--accent); color: white; border: none; padding: 1.2rem; font-size: 1.1rem; font-weight: 700; border-radius: 12px; cursor: pointer; margin-top: 1rem; transition: background 0.2s; }
+        .btn-pay:hover { background: #c82333; }
+
+        @media (max-width: 900px) {
+            .event-container { flex-direction: column; }
+            .booking-sidebar { width: 100%; box-sizing: border-box; position: static; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index.html" class="logo">Athena<span>Fest</span></a>
+        <a href="index.html" class="back-link">← Back to all events</a>
+    </nav>
+
+    <div class="event-container">
+        
+        <div class="event-details">
+            <!-- Added IDs so JS can inject data here -->
+            <div class="hero-banner img-default" id="hero-banner"></div>
+            
+            <h1 class="event-title" id="display-title">Loading Event...</h1>
+            
+            <div class="event-meta">
+                <div class="meta-item">
+                    <span class="meta-label">Date & Time</span>
+                    <span class="meta-value" id="display-date">Loading...</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Venue</span>
+                    <span class="meta-value" id="display-venue">Loading...</span>
+                </div>
+            </div>
+
+            <div class="about-section">
+                <h3>About the Event</h3>
+                <p id="display-about">Fetching event details...</p>
+                <p><strong>Terms & Conditions:</strong> Tickets are non-refundable. Re-entry is not permitted once the ticket is scanned. Management reserves the right to admission.</p>
+            </div>
+        </div>
+
+        <div class="booking-sidebar">
+            <h2 class="price-header">₹500 <span>/ per pass</span></h2>
+            
+            <form id="bookingForm">
+                <div class="form-group">
+                    <label>Student Name</label>
+                    <input type="text" id="name" class="form-control" placeholder="Enter your full name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>College Name</label>
+                    <input type="text" id="college" class="form-control" placeholder="E.g. XYZ Institute" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Course</label>
+                    <select id="course" class="form-control" required>
+                        <option value="" disabled selected>Select your course</option>
+                        <option value="B.Tech">B.Tech</option>
+                        <option value="B.Sc">B.Sc</option>
+                        <option value="B.Com">B.Com</option>
+                        <option value="B.A.">B.A.</option>
+                        <option value="MBA">MBA</option>
+                        <option value="MCA">MCA</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Mobile Number</label>
+                    <input type="tel" id="mobile" class="form-control" 
+                           placeholder="10-digit number"
+                           pattern="[0-9]{10}" 
+                           maxlength="10" 
+                           title="Please enter a valid 10-digit mobile number" 
+                           oninput="this.value = this.value.replace(/[^0-9]/g, '')" 
+                           required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Number of Passes</label>
+                    <input type="number" id="passes" class="form-control" min="1" value="1" required>
+                </div>
+                
+                <button type="submit" class="btn-pay">Proceed to Pay</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 1. The Local Database of Events
+        const eventDatabase = {
+            'EDM-Night': {
+                title: 'EDM Concert Night ft. Top DJs',
+                date: 'Monday, 19 Oct 2026 | 8:00 PM',
+                venue: 'Main Campus Ground',
+                about: 'Get ready to experience the biggest musical night on campus. Dance to the beats of top DJs with an incredible visual production and laser show. Food and beverages will be available at the venue.',
+                bannerClass: 'img-edm',
+                image: 'images/edm.jpg' // Local path
+            },
+            'Hackathon': {
+                title: 'Tech Hackathon 24-Hour Challenge',
+                date: 'Tuesday, 20 Oct 2026 | 10:00 AM',
+                venue: 'Computer Science Block',
+                about: 'Join our 24-hour coding challenge. Build, innovate, and win amazing prizes while networking with tech leaders. Mentors from top tech companies will be available to guide you. Bring your own laptops!',
+                bannerClass: 'img-tech',
+                image: 'images/hackathon.jpg' // Local path
+            },
+            'Cloud-Bootcamp': {
+                title: 'Cloud Architecture Bootcamp (AWS & Docker)',
+                date: 'Wednesday, 21 Oct 2026 | 11:00 AM',
+                venue: 'Seminar Hall 2',
+                about: 'A hands-on technical workshop covering the essentials of modern infrastructure. Learn to deploy scalable applications using AWS, Docker, and Kubernetes. Prerequisites: Basic understanding of Linux.',
+                bannerClass: 'img-tech',
+                image: 'images/cloud.jpg' // Local path
+            },
+            'Fashion-Show': {
+                title: 'Campus Couture Fashion Show',
+                date: 'Thursday, 22 Oct 2026 | 6:30 PM',
+                venue: 'College Auditorium',
+                about: 'Witness the latest trends and creative designs as our talented students strut down the runway. A night of glamour, style, and high fashion, judged by industry professionals.',
+                bannerClass: 'img-fashion',
+                image: 'images/fashion.jpg' // Local path
+            },
+            'Dance-Battle': {
+                title: 'Inter-College Dance Battle Championship',
+                date: 'Friday, 23 Oct 2026 | 5:00 PM',
+                venue: 'Open Air Theatre',
+                about: 'Get ready for a spectacular showcase of rhythm and energy! Watch top dance crews from various colleges battle it out on stage for the ultimate championship title and cash prizes.',
+                bannerClass: 'img-dance',
+                image: 'images/dance.jpg' // Local path
+            },
+            'Comedy-Fiesta': {
+                title: 'Stand-up Comedy Fiesta',
+                date: 'Saturday, 24 Oct 2026 | 7:00 PM',
+                venue: 'Student Activity Center',
+                about: 'Take a break from the competitions and laugh out loud with some of the best up-and-coming comedians from across the country. A perfect way to wind down the festival weekend.',
+                bannerClass: 'img-comedy',
+                image: 'images/comedy.jpg' // Local path
+            }
+        };
+
+        // 2. Fetch the Event ID from the URL (e.g., ?event=Hackathon)
+        const urlParams = new URLSearchParams(window.location.search);
+        const eventId = urlParams.get('event');
+
+        // 3. Inject the correct details into the HTML
+        if(eventId && eventDatabase[eventId]) {
+            const data = eventDatabase[eventId];
+            document.getElementById('display-title').innerText = data.title;
+            document.getElementById('display-date').innerText = data.date;
+            document.getElementById('display-venue').innerText = data.venue;
+            document.getElementById('display-about').innerText = data.about;
+            
+            // THIS IS THE CRITICAL PART FOR THE IMAGE
+            const banner = document.getElementById('hero-banner');
+            banner.style.backgroundImage = `url('${data.image}')`;
+            banner.style.backgroundSize = 'cover';
+            banner.style.backgroundPosition = 'center';
+        } else {
+            // Fallback just in case someone visits event.html without a link
+            document.getElementById('display-title').innerText = "Event Not Found";
+            document.getElementById('display-about').innerText = "Please return to the home page and select a valid event.";
+        }
+
+        // Razorpay Booking Logic
+        document.getElementById('bookingForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Optional: Grab the actual event title to save into your database if you want
+            const actualEventTitle = document.getElementById('display-title').innerText;
+
+            const studentData = {
+                name: document.getElementById('name').value,
+                college: document.getElementById('college').value,
+                course: document.getElementById('course').value,
+                mobile: document.getElementById('mobile').value,
+                passes: document.getElementById('passes').value,
+                eventName: actualEventTitle // Passing the event name to the backend!
+            };
+
+            const response = await fetch('/create-order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ passes: studentData.passes })
+            });
+            const order = await response.json();
+
+            var options = {
+                "key": "rzp_test_Tba7pWVS1R6t4S", // Replace with your key
+                "amount": order.amount,
+                "currency": "INR",
+                "name": "Athena Fest 2026",
+                "description": actualEventTitle,
+                "order_id": order.id,
+                "handler": async function (response) {
+                    const verifyRes = await fetch('/verify-payment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            ...response,
+                            studentDetails: studentData 
+                        })
+                    });
+                    const verifyData = await verifyRes.json();
+
+                    if(verifyData.success) {
+                        // --- FOOLPROOF METHOD: Get data directly from the dictionary ---
+                        // 1. Find out which event page we are on from the URL
+                        const currentUrlParams = new URLSearchParams(window.location.search);
+                        const currentEventId = currentUrlParams.get('event');
+                        
+                        // 2. Look up the exact details in our eventDatabase
+                        const eventInfo = eventDatabase[currentEventId]; 
+                        
+                        // 3. Securely pass those exact details into the success URL
+                        window.location.href = `/success.html?name=${encodeURIComponent(studentData.name)}&passes=${studentData.passes}&paymentId=${response.razorpay_payment_id}&event=${encodeURIComponent(eventInfo.title)}&date=${encodeURIComponent(eventInfo.date)}`;
+                    } else {
+                        alert("Payment verification failed. Please contact support.");
+                    }
+                },
+                "theme": { "color": "#E23744" }
+            };
+            var rzp1 = new Razorpay(options);
+            rzp1.open();
+        });
+    </script>
+</body>
+</html>
